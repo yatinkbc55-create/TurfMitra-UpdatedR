@@ -1,0 +1,43 @@
+import { chromium } from '/opt/npm-tools/node_modules/playwright/index.mjs';
+import { createServer } from 'http'; import { readFileSync, existsSync } from 'fs'; import { join, extname, dirname } from 'path'; import { fileURLToPath } from 'url';
+const root = join(dirname(fileURLToPath(import.meta.url)), '..'); const T = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/json' };
+const srv = createServer((q, r) => { let p = q.url.split('?')[0]; if (p === '/') p = '/index.html'; if (p === '/js/config.js') { r.writeHead(200, { 'content-type': 'text/javascript' }); return r.end('export const DEMO_LOCK=false;export const CONTACT="1";export const PUBLIC_KEY={};'); } const f = join(root, p); if (!existsSync(f)) { r.statusCode = 404; return r.end(); } r.setHeader('content-type', T[extname(f)] || 'application/octet-stream'); r.end(readFileSync(f)); }).listen(0);
+const url = `http://localhost:${srv.address().port}/`; const b = await chromium.launch(); const ctx = await b.newContext({ locale: 'en-IN', timezoneId: 'Asia/Kolkata', serviceWorkers: 'block' }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', (e) => errs.push(e.message));
+let ok = 0, bad = 0; const check = (n, c) => { c ? ok++ : bad++; console.log((c ? '  ✓ ' : '  ✗ ') + n); };
+const vis = (s) => p.isVisible(s);
+await p.goto(url + '#/register'); await p.waitForSelector('#view-register:not([hidden])');
+await p.fill('#registerForm [name=name]', 'Owner'); await p.fill('#registerForm [name=email]', 'o@t.test'); await p.fill('#registerForm [name=password]', 'owner1'); await p.click('#registerForm button[type=submit]');
+await p.waitForSelector('#view-onboarding:not([hidden])');
+// skip onboarding via data
+await p.evaluate(() => new Promise((res) => { const r = indexedDB.open('turfmitra'); r.onsuccess = () => { const tx = r.result.transaction('kv', 'readwrite'), os = tx.objectStore('kv'), q = os.get('turfmitra.db.v1'); q.onsuccess = () => { const db = q.result; db.users[0].onboarded = true; db.grounds.push({ id: 'g1', name: 'G', sport: 'football', weekendPct: 0, slots: [{ id: 's1', start: '06:00', end: '07:00', price: 1000 }] }); db.customers.push({ id: 'c1', name: 'Cust', phone: '9822012345', email: '' }); os.put(db, 'turfmitra.db.v1'); }; tx.oncomplete = () => res(); }; }));
+await p.reload(); await p.evaluate(() => (location.hash = '#/dashboard')); await p.waitForSelector('#view-dashboard:not([hidden])');
+check('owner sees all 8 nav items', (await p.$$('#nav a')).length === 8);
+await p.click('a[href="#/settings"]');
+await p.fill('#staffForm [name=sname]', 'Mgr'); await p.fill('#staffForm [name=semail]', 'm@t.test'); await p.fill('#staffForm [name=spw]', 'mgr123'); await p.click('#staffForm button[type=submit]');
+check('manager is created with default perms (cancel only)', await p.evaluate(() => document.querySelector('[data-perm=cancel]').checked && !document.querySelector('[data-perm=discount]').checked && !document.querySelector('[data-perm=reports]').checked));
+const login = async (e, pw) => { await p.click('#logoutBtn'); await p.waitForSelector('#view-login:not([hidden])'); await p.fill('#loginForm [name=email]', e); await p.fill('#loginForm [name=password]', pw); await p.click('#loginForm button[type=submit]'); };
+await login('m@t.test', 'mgr123'); await p.waitForSelector('#view-dashboard:not([hidden])');
+const nav = async () => (await p.$$eval('#nav a', (a) => a.map((x) => x.getAttribute('href'))));
+let n = await nav(); check('manager nav hides Grounds & Reports', n.length === 6 && !n.includes('#/grounds') && !n.includes('#/reports'));
+check('manager dashboard hides revenue stat, chart, achievements', !(await p.textContent('#stats')).includes('Revenue') && !(await vis('#chart7')) && !(await p.textContent('#achv')).trim());
+await p.evaluate(() => (location.hash = '#/grounds')); await p.waitForTimeout(200); check('manager cannot open Grounds by URL', await vis('#view-dashboard'));
+await p.evaluate(() => (location.hash = '#/reports')); await p.waitForTimeout(200); check('manager cannot open Reports by URL', await vis('#view-dashboard'));
+await p.click('a[href="#/settings"]'); check('manager settings hide backup/activity/business/managers', !(await vis('#backupCard')) && !(await vis('#activityCard')) && !(await vis('#bizForm')) && !(await vis('#staffForm')));
+await p.click('a[href="#/bookings"]'); await p.click('#newBookingBtn'); check('discount field hidden for manager', !(await vis('#bookingForm [name=discount]')));
+await p.selectOption('#bkGround', 'g1'); await p.selectOption('#bkSlot', 's1'); await p.selectOption('#bkCustomer', 'c1'); await p.fill('#bookingForm [name=advance]', '0'); await p.evaluate(() => { const f = document.querySelector('#bookingForm'); f.querySelector('[name=discount]').value = '500'; }); await p.click('#bookingForm button[type=submit]'); await p.waitForTimeout(500); await p.waitForSelector('#bookingList .item');
+check('discount ignored even if forced', await p.evaluate(() => new Promise((res) => { const r = indexedDB.open('turfmitra'); r.onsuccess = () => { const q = r.result.transaction('kv').objectStore('kv').get('turfmitra.db.v1'); q.onsuccess = () => res(q.result.bookings[0].discount === 0); }; })));
+check('cancel button visible (default perm)', await vis('#bookingList [data-cancel]'));
+// owner grants perms
+await login('o@t.test', 'owner1'); await p.waitForSelector('#view-dashboard:not([hidden])'); await p.click('a[href="#/settings"]');
+await p.check('[data-perm=reports]'); await p.uncheck('[data-perm=cancel]'); await p.check('[data-perm=discount]');
+await login('m@t.test', 'mgr123'); await p.waitForSelector('#view-dashboard:not([hidden])'); n = await nav();
+check('reports permission grants Reports page', n.includes('#/reports'));
+await p.click('a[href="#/bookings"]'); check('cancel hidden when revoked', !(await vis('#bookingList [data-cancel]')));
+await p.click('#newBookingBtn'); check('discount field shown when granted', await vis('#bookingForm [name=discount]')); await p.keyboard.press('Escape');
+// suspend + password reset
+await login('o@t.test', 'owner1'); await p.waitForSelector('#view-dashboard:not([hidden])'); await p.click('a[href="#/settings"]');
+await p.fill('[data-pwfor]', 'newpass1'); await p.click('[data-setpw]'); await p.click('[data-toggle]');
+await login('m@t.test', 'mgr123'); check('old password rejected', await vis('#loginForm .err:not(:empty)') || (await p.textContent('#loginForm')).length > 0 && !(await vis('#view-dashboard')));
+await p.fill('#loginForm [name=password]', 'newpass1'); await p.click('#loginForm button[type=submit]'); await p.waitForTimeout(300);
+check('suspended manager cannot log in', !(await vis('#view-dashboard')) && (await p.textContent('#loginForm')).includes('suspended'));
+check('no script errors', errs.length === 0); console.log(`\n${ok} passed, ${bad} failed`); await b.close(); srv.close(); process.exit(bad ? 1 : 0);

@@ -1,0 +1,7 @@
+{
+  "appId": "com.jnmsoftwares.turfmitra",
+  "appName": "TurfMitra",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "android": { "backgroundColor": "#F6F1E7" }
+}

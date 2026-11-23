@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17503A">
+<title>TurfMitra</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Mukta:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="lang-en">
+<div id="topProgress" aria-hidden="true"></div>
+<div id="statusPop" class="pop" hidden aria-hidden="true"></div>
+<div id="confetti" hidden aria-hidden="true"></div>
+<div id="splash" aria-hidden="true"><img src="assets/logo/logo.png" alt=""><div class="splash-bar"><i></i></div></div>
+<header class="topbar">
+  <a class="brand" href="#/" data-route-home><img id="brandImg" class="brand-img" alt="" hidden><svg class="logo-mark" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#17503A"/><g fill="none" stroke="#E8892B" stroke-width="1.8"><rect x="6" y="9" width="20" height="14" rx="1.5"/><line x1="16" y1="9" x2="16" y2="23"/><circle cx="16" cy="16" r="3.2"/></g></svg><span class="brandtxt"><span data-i18n="app.name">TurfMitra</span><small class="by" data-i18n="app.by"></small></span></a>
+  <div class="topbar-right">
+    <span class="demo-badge" id="demoBadge" hidden></span>
+    <div class="lang-switch" role="group" data-i18n-aria="lang.label" data-i18n-title="tooltips.language" id="langSwitch"></div>
+    <button class="btn ghost small" id="logoutBtn" hidden data-i18n="nav.logout" data-i18n-title="tooltips.logout"></button>
+  </div>
+</header>
+
+<div class="shell">
+  <nav id="nav" class="nav" hidden aria-label="Main"></nav>
+  <main id="main">
+    <div id="focusBar" class="focusbar" hidden></div>
+
+    <!-- Public home -->
+    <section id="view-home" class="view" hidden>
+      <div class="hero card">
+        <h1 data-i18n="public.heroTitle"></h1>
+        <p class="muted" data-i18n="public.heroSubtitle"></p>
+        <div class="row">
+          <a class="btn primary" href="#/register" data-i18n="public.getStarted"></a>
+          <a class="btn" href="#/login" data-i18n="public.signIn"></a>
+        </div>
+        <p class="note" data-i18n="public.demoNote"></p>
+      </div>
+      <h2 data-i18n="public.featuresTitle"></h2>
+      <div class="grid3">
+        <div class="card"><h3 data-i18n="public.f1Title"></h3><p class="muted" data-i18n="public.f1Desc"></p></div>
+        <div class="card"><h3 data-i18n="public.f2Title"></h3><p class="muted" data-i18n="public.f2Desc"></p></div>
+        <div class="card"><h3 data-i18n="public.f3Title"></h3><p class="muted" data-i18n="public.f3Desc"></p></div>
+      </div>
+    </section>
+
+    <!-- Login -->
+    <section id="view-login" class="view narrow" hidden>
+      <form class="card" id="loginForm" novalidate>
+        <h1 data-i18n="auth.loginTitle"></h1>
+        <p class="muted" data-i18n="auth.loginSubtitle"></p>
+        <label class="field"><span data-i18n="auth.email"></span><input name="email" type="email" autocomplete="username" value=""><small class="err" data-err="email"></small></label>
+        <label class="field"><span data-i18n="auth.password"></span><input name="password" type="password" autocomplete="current-password"><small class="err" data-err="password"></small></label>
+        <small class="err" data-err="form"></small>
+        <button class="btn primary block" type="submit" data-i18n="auth.signIn"></button>
+        <p class="muted center"><span data-i18n="auth.noAccount"></span> <a href="#/register" data-i18n="nav.register"></a></p>
+      </form>
+    </section>
+
+    <!-- Register -->
+    <section id="view-register" class="view narrow" hidden>
+      <form class="card" id="registerForm" novalidate>
+        <h1 data-i18n="auth.registerTitle"></h1>
+        <label class="field"><span data-i18n="auth.fullName"></span><input name="name" autocomplete="name"><small class="err" data-err="name"></small></label>
+        <label class="field"><span data-i18n="auth.email"></span><input name="email" type="email" autocomplete="email"><small class="err" data-err="email"></small></label>
+        <label class="field"><span data-i18n="auth.password"></span><input name="password" type="password" autocomplete="new-password" data-i18n-placeholder="auth.passwordHint"><small class="err" data-err="password"></small></label>
+        <label class="field" id="acctField" hidden><span data-i18n="auth.accountType"></span><select name="acct"><option value="owner" data-i18n="auth.acctOwner"></option><option value="admin" data-i18n="auth.acctAdmin"></option></select><small class="note" data-i18n="auth.acctHint"></small></label>
+        <button class="btn primary block" type="submit" data-i18n="auth.createAccount"></button>
+        <p class="muted center"><span data-i18n="auth.haveAccount"></span> <a href="#/login" data-i18n="nav.login"></a></p>
+      </form>
+    </section>
+
+    <!-- Onboarding wizard -->
+    <section id="view-onboarding" class="view narrow" hidden>
+      <form class="card" id="onbForm" novalidate>
+        <h1 data-i18n="onboarding.title"></h1>
+        <p class="muted" id="onbStep"></p>
+        <div class="onb-step" data-step="1">
+          <h3 data-i18n="onboarding.s1Title"></h3>
+          <label class="field"><span data-i18n="onboarding.businessName"></span><input name="businessName"><small class="err" data-err="businessName"></small></label>
+          <label class="field"><span data-i18n="onboarding.phone"></span><input name="phone" inputmode="numeric" maxlength="10"><small class="err" data-err="phone"></small></label>
+        </div>
+        <div class="onb-step" data-step="2" hidden>
+          <h3 data-i18n="onboarding.s2Title"></h3>
+          <label class="field"><span data-i18n="onboarding.groundName"></span><input name="groundName"><small class="err" data-err="groundName"></small></label>
+          <label class="field"><span data-i18n="onboarding.sport"></span><select name="sport" class="sport-select"></select></label>
+          <label class="field"><span data-i18n="onboarding.pricePerHour"></span><input name="price" type="number" min="1" inputmode="numeric" value="1000"><small class="err" data-err="price"></small></label>
+        </div>
+        <div class="onb-step" data-step="3" hidden>
+          <h3 data-i18n="onboarding.s3Title"></h3>
+          <label class="field"><span data-i18n="onboarding.opening"></span><input name="open" type="time" value="06:00"><small class="err" data-err="open"></small></label>
+          <label class="field"><span data-i18n="onboarding.closing"></span><input name="close" type="time" value="22:00"><small class="err" data-err="close"></small></label>
+          <p class="note" id="onbPreview"></p>
+        </div>
+        <div class="row between">
+          <button class="btn" type="button" id="onbBack" data-i18n="common.back"></button>
+          <button class="btn primary" type="submit" id="onbNext" data-i18n="common.next"></button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="view-dashboard" class="view" hidden>
+      <div id="dashHero"></div>
+      <h1 class="sr" data-i18n="dashboard.title"></h1>
+      <p class="muted sr" id="welcome"></p>
+      <div id="quest"></div>
+      <div class="stats" id="stats"></div>
+      <div id="achv"></div>
+      <h2 data-i18n="dashboard.last7"></h2>
+      <div class="card" id="chart7"></div>
+      <h2 data-i18n="dashboard.topCustomers"></h2>
+      <div id="topCust" class="list"></div>
+      <h2 data-i18n="dashboard.upcoming"></h2>
+      <div id="upcomingList" class="list"></div>
+    </section>
+
+    <!-- Board -->
+    <section id="view-board" class="view" hidden>
+      <div class="row between wrap"><h1 data-i18n="board.title"></h1><span class="badge confirmed" id="boardOcc"></span></div>
+      <div class="row datebar"><button class="btn small" type="button" id="boardPrev" data-i18n="board.prev"></button><input type="date" id="boardDate"><button class="btn small" type="button" id="boardToday" data-i18n="board.today"></button><button class="btn small" type="button" id="boardNext" data-i18n="board.next"></button></div>
+      <p class="note" data-i18n="board.hint"></p>
+      <div class="legend"><span class="dot free"></span><span data-i18n="board.free"></span><span class="dot paid"></span><span data-i18n="pay.paid"></span><span class="dot partial"></span><span data-i18n="pay.partial"></span><span class="dot unpaid"></span><span data-i18n="pay.unpaid"></span></div>
+      <div id="boardOut"></div>
+    </section>
+
+    <!-- Dues -->
+    <section id="view-dues" class="view" hidden>
+      <h1 data-i18n="dues.title"></h1>
+      <p class="muted" data-i18n="dues.subtitle"></p>
+      <div class="stat big" id="duesTotal"></div>
+      <p class="note" data-i18n="wa.note"></p>
+      <div id="duesList" class="list"></div>
+    </section>
+
+    <!-- Grounds -->
+    <section id="view-grounds" class="view" hidden>
+      <div class="row between wrap"><h1 data-i18n="grounds.title"></h1><button class="btn primary" id="newGroundBtn" data-i18n="grounds.create"></button></div>
+      <div id="groundList" class="list"></div>
+    </section>
+
+    <!-- Admin panel -->
+    <section id="view-admin" class="view" hidden>
+      <h1 data-i18n="admin.title"></h1><p class="muted" data-i18n="admin.hint"></p>
+      <label class="field focus-pick"><span data-i18n="admin.viewing"></span><select id="adminFocus"></select></label>
+      <div class="stats" id="adminStats"></div>
+      <h2 data-i18n="admin.owners"></h2>
+      <div id="adminOwners" class="list"></div>
+      <div class="grid3 admin-forms">
+        <form class="card" id="ownerForm" novalidate>
+          <h3 data-i18n="admin.addOwner"></h3>
+          <label class="field"><span data-i18n="auth.fullName"></span><input name="oname"><small class="err" data-err="oname"></small></label>
+          <label class="field"><span data-i18n="auth.email"></span><input name="oemail" type="email" autocomplete="off"><small class="err" data-err="oemail"></small></label>
+          <label class="field"><span data-i18n="auth.password"></span><input name="opw" type="password" autocomplete="new-password"><small class="err" data-err="opw"></small></label>
+          <button class="btn primary" type="submit" data-i18n="admin.addOwnerBtn"></button>
+        </form>
+        <form class="card" id="amgrForm" novalidate>
+          <h3 data-i18n="staff.add"></h3>
+          <label class="field"><span data-i18n="admin.forOwner"></span><select name="mowner" id="amgrOwner"></select><small class="err" data-err="mowner"></small></label>
+          <label class="field"><span data-i18n="auth.fullName"></span><input name="mname"><small class="err" data-err="mname"></small></label>
+          <label class="field"><span data-i18n="auth.email"></span><input name="memail" type="email" autocomplete="off"><small class="err" data-err="memail"></small></label>
+          <label class="field"><span data-i18n="auth.password"></span><input name="mpw" type="password" autocomplete="new-password"><small class="err" data-err="mpw"></small></label>
+          <div class="perms"><label class="chk"><input type="checkbox" name="pdiscount"> <span data-i18n="staff.perm.discount"></span></label><label class="chk"><input type="checkbox" name="pcancel" checked> <span data-i18n="staff.perm.cancel"></span></label><label class="chk"><input type="checkbox" name="preports"> <span data-i18n="staff.perm.reports"></span></label></div>
+          <button class="btn primary" type="submit" data-i18n="staff.add"></button>
+        </form>
+      </div>
+      <h2 data-i18n="settings.activity"></h2>
+      <div class="card"><div id="adminLog"></div></div>
+    </section>
+
+    <!-- Customers -->
+    <section id="view-customers" class="view" hidden>
+      <div class="row between wrap"><h1 data-i18n="customers.title"></h1><button class="btn primary" id="newCustomerBtn" data-i18n="customers.add"></button></div>
+      <input type="search" id="customerSearch" class="search" data-i18n-placeholder="customers.searchPlaceholder" data-i18n-aria="common.search">
+      <div id="customerList" class="list"></div>
+    </section>
+
+    <!-- Bookings -->
+    <section id="view-bookings" class="view" hidden>
+      <div class="row between wrap"><h1 data-i18n="bookings.title"></h1><button class="btn primary" id="newBookingBtn" data-i18n="bookings.create"></button></div>
+      <div class="filters">
+        <label class="field"><span data-i18n="bookings.filterStatus"></span>
+          <select id="fStatus"><option value="" data-i18n="common.all"></option><option value="confirmed" data-i18n="status.confirmed"></option><option value="completed" data-i18n="status.completed"></option><option value="cancelled" data-i18n="status.cancelled"></option></select></label>
+        <label class="field"><span data-i18n="bookings.date"></span><input type="date" id="fDate"></label>
+      </div>
+      <div id="bookingList" class="list"></div>
+    </section>
+
+    <!-- Reports -->
+    <section id="view-reports" class="view" hidden>
+      <h1 data-i18n="reports.title"></h1>
+      <form class="filters" id="reportForm">
+        <label class="field"><span data-i18n="common.from"></span><input type="date" name="from"></label>
+        <label class="field"><span data-i18n="common.to"></span><input type="date" name="to"></label>
+        <button class="btn primary" type="submit" data-i18n="reports.generate"></button>
+        <button class="btn" type="button" id="pdfBtn" data-i18n="reports.exportPdf"></button>
+      </form>
+      <div id="reportOut"></div>
+      <h2 data-i18n="insights.title"></h2>
+      <div id="insightsOut"></div>
+      <div class="row between wrap"><h2 data-i18n="insights.expenses"></h2><button class="btn small primary" id="newExpenseBtn" data-i18n="insights.addExpense"></button></div>
+      <div id="expenseList" class="list"></div>
+    </section>
+
+    <!-- Settings -->
+    <section id="view-settings" class="view narrow" hidden>
+      <h1 data-i18n="settings.title"></h1>
+      <form class="card" id="bizForm" novalidate>
+        <h3 data-i18n="biz.title"></h3>
+        <div class="logo-row"><img id="bizPreview" class="biz-logo-lg" alt=""><div>
+          <label class="btn small" for="logoFile" data-i18n="biz.upload"></label><input type="file" id="logoFile" accept="image/*" hidden>
+          <button class="btn small ghost" type="button" id="logoRemove" data-i18n="biz.remove"></button>
+          <p class="note" data-i18n="biz.logoHint"></p></div></div>
+        <label class="field"><span data-i18n="biz.name"></span><input name="bname"><small class="err" data-err="bname"></small></label>
+        <label class="field"><span data-i18n="onboarding.phone"></span><input name="bphone" inputmode="numeric" maxlength="10"><small class="err" data-err="bphone"></small></label>
+        <button class="btn primary" type="submit" data-i18n="common.save"></button>
+      </form>
+      <form class="card" id="profileForm" novalidate>
+        <h3 data-i18n="settings.profile"></h3>
+        <label class="field"><span data-i18n="settings.name"></span><input name="name"><small class="err" data-err="name"></small></label>
+        <label class="field"><span data-i18n="settings.preferredLanguage"></span><select name="lang" id="settingsLang"></select><small class="err" data-err="lang"></small></label>
+        <div class="kv"><span class="muted" data-i18n="settings.timezone"></span><b data-i18n="settings.timezoneValue"></b></div>
+        <div class="kv"><span class="muted" data-i18n="settings.currency"></span><b data-i18n="settings.currencyValue"></b></div>
+        <button class="btn primary" type="submit" data-i18n="settings.saveProfile"></button>
+      </form>
+      <form class="card" id="pwForm" novalidate>
+        <h3 data-i18n="settings.changePassword"></h3>
+        <label class="field"><span data-i18n="settings.currentPassword"></span><input name="current" type="password" autocomplete="current-password"><small class="err" data-err="current"></small></label>
+        <label class="field"><span data-i18n="settings.newPassword"></span><input name="next" type="password" autocomplete="new-password"><small class="err" data-err="next"></small></label>
+        <label class="field"><span data-i18n="settings.confirmPassword"></span><input name="confirm" type="password" autocomplete="new-password"><small class="err" data-err="confirm"></small></label>
+        <button class="btn primary" type="submit" data-i18n="settings.changePassword"></button>
+      </form>
+      <form class="card" id="staffForm" novalidate>
+        <h3 data-i18n="staff.title"></h3><p class="muted" data-i18n="staff.hint"></p>
+        <div id="staffList"></div>
+        <label class="field"><span data-i18n="auth.fullName"></span><input name="sname"><small class="err" data-err="sname"></small></label>
+        <label class="field"><span data-i18n="auth.email"></span><input name="semail" type="email" autocomplete="off"><small class="err" data-err="semail"></small></label>
+        <label class="field"><span data-i18n="auth.password"></span><input name="spw" type="password" autocomplete="new-password"><small class="err" data-err="spw"></small></label>
+        <div class="perms"><label class="chk"><input type="checkbox" name="pdiscount"> <span data-i18n="staff.perm.discount"></span></label><label class="chk"><input type="checkbox" name="pcancel" checked> <span data-i18n="staff.perm.cancel"></span></label><label class="chk"><input type="checkbox" name="preports"> <span data-i18n="staff.perm.reports"></span></label></div>
+        <button class="btn" type="submit" data-i18n="staff.add"></button>
+      </form>
+      <div class="card" id="backupCard">
+        <h3 data-i18n="settings.backupTitle"></h3>
+        <p class="muted" data-i18n="settings.backupHint"></p>
+        <p class="note" id="storageNote" data-i18n="settings.storageNote"></p>
+        <div class="row"><button class="btn" type="button" id="backupBtn" data-i18n="settings.download"></button>
+          <label class="btn" for="restoreFile" data-i18n="settings.restore"></label><input type="file" id="restoreFile" accept="application/json,.json" hidden>
+          <button class="btn danger" type="button" id="resetBtn" data-i18n="settings.reset"></button></div>
+      </div>
+      <div class="card" id="activityCard"><h3 data-i18n="settings.activity"></h3><div id="activityList"></div></div>
+    </section>
+  </main>
+</div>
+
+<!-- Dialogs (static DOM: contents survive language switches) -->
+<dialog id="groundDlg" class="sheet"><form method="dialog" id="groundForm" novalidate>
+  <div class="sheet-h"><button type="button" class="round" data-close aria-label="Close">←</button><h3 id="groundDlgTitle" data-i18n="grounds.create"></h3></div>
+  <label class="field" id="gOwnerField" hidden><span data-i18n="admin.forOwner"></span><select name="gowner" id="gOwner"></select><small class="err" data-err="gowner"></small></label>
+  <label class="field"><span data-i18n="grounds.name"></span><input name="name"><small class="err" data-err="name"></small></label>
+  <label class="field"><span data-i18n="grounds.sport"></span><select name="sport" class="sport-select"></select></label>
+  <label class="field"><span data-i18n="turf.address"></span><input name="address"></label>
+  <label class="field"><span data-i18n="turf.size"></span><input name="size" placeholder="100 × 65 ft"></label>
+  <label class="field"><span data-i18n="turf.about"></span><textarea name="about" rows="3"></textarea></label>
+  <div class="field"><span data-i18n="turf.facilities"></span><div class="ftiles" id="gFacilities"></div></div>
+  <div class="field"><span data-i18n="turf.gallery"></span>
+    <div class="gthumbs" id="gThumbs"></div>
+    <label class="btn small" for="gPhotoFile" data-i18n="turf.addPhotos"></label><input type="file" id="gPhotoFile" accept="image/*" multiple hidden><p class="note" data-i18n="turf.photoHint"></p></div>
+  <label class="chk switch"><input type="checkbox" name="active" checked> <span data-i18n="turf.activeLabel"></span></label>
+  <div class="row end"><button class="btn" type="button" data-close data-i18n="common.cancel"></button><button class="btn primary" type="submit" data-i18n="common.save"></button></div>
+</form></dialog>
+
+<dialog id="turfDlg" class="sheet turf"><div id="turfBody"></div></dialog>
+
+<dialog id="priceDlg"><form method="dialog" id="priceForm" novalidate>
+  <h3 data-i18n="grounds.weekendPricing"></h3><p class="muted" id="priceGround"></p>
+  <label class="field"><span data-i18n="grounds.weekendPct"></span><input name="pct" type="number" min="0" max="100" inputmode="numeric"><small class="err" data-err="pct"></small></label>
+  <div class="row end"><button class="btn" type="button" data-close data-i18n="common.cancel"></button><button class="btn primary" type="submit" data-i18n="common.save"></button></div>
+</form></dialog>
+
+<dialog id="expenseDlg"><form method="dialog" id="expenseForm" novalidate>
+  <h3 data-i18n="insights.addExpense"></h3>
+  <label class="field"><span data-i18n="insights.category"></span><select name="category"><option value="electricity" data-i18n="expense.electricity"></option><option value="maintenance" data-i18n="expense.maintenance"></option><option value="salary" data-i18n="expense.salary"></option><option value="equipment" data-i18n="expense.equipment"></option><option value="other" data-i18n="expense.other"></option></select></label>
+  <label class="field"><span data-i18n="insights.amount"></span><input name="amount" type="number" min="1" inputmode="numeric"><small class="err" data-err="amount"></small></label>
+  <label class="field"><span data-i18n="bookings.date"></span><input name="date" type="date"><small class="err" data-err="date"></small></label>
+  <label class="field"><span data-i18n="insights.note"></span><input name="note"></label>
+  <div class="row end"><button class="btn" type="button" data-close data-i18n="common.cancel"></button><button class="btn primary" type="submit" data-i18n="common.save"></button></div>
+</form></dialog>
+
+<dialog id="receiptDlg"><div id="receiptBody"></div>
+  <p class="note" data-i18n="wa.note"></p>
+  <div class="row end"><button class="btn" type="button" data-close data-i18n="common.close"></button><button class="btn" type="button" id="receiptPrint" data-i18n="receipt.print"></button><a class="btn primary" id="receiptWa" target="_blank" rel="noopener" data-i18n="receipt.share"></a></div>
+</dialog>
+
+<dialog id="slotsDlg"><div>
+  <h3 data-i18n="grounds.slotsTitle"></h3><p class="muted" id="slotsGroundName"></p>
+  <div id="slotList" class="list compact"></div>
+  <form id="slotForm" novalidate>
+    <div class="row3">
+      <label class="field"><span data-i18n="grounds.start"></span><input name="start" type="time"><small class="err" data-err="start"></small></label>
+      <label class="field"><span data-i18n="grounds.end"></span><input name="end" type="time"><small class="err" data-err="end"></small></label>
+      <label class="field"><span data-i18n="grounds.price"></span><input name="price" type="number" min="1" inputmode="numeric"><small class="err" data-err="price"></small></label>
+    </div>
+    <div class="row end"><button class="btn" type="button" data-close data-i18n="common.close"></button><button class="btn primary" type="submit" data-i18n="grounds.addSlot"></button></div>
+  </form>
+</div></dialog>
+
+<dialog id="customerDlg"><form method="dialog" id="customerForm" novalidate>
+  <h3 data-i18n="customers.add"></h3>
+  <label class="field"><span data-i18n="customers.name"></span><input name="name"><small class="err" data-err="name"></small></label>
+  <label class="field"><span data-i18n="customers.phone"></span><input name="phone" inputmode="numeric" maxlength="10"><small class="err" data-err="phone"></small></label>
+  <label class="field"><span data-i18n="customers.email"></span><input name="email" type="email"><small class="err" data-err="email"></small></label>
+  <div class="row end"><button class="btn" type="button" data-close data-i18n="common.cancel"></button><button class="btn primary" type="submit" data-i18n="common.save"></button></div>
+</form></dialog>
+
+<dialog id="bookingDlg" class="sheet"><form method="dialog" id="bookingForm" novalidate>
+  <div class="sheet-h"><button type="button" class="round" data-close aria-label="Close">←</button><h3 data-i18n="bk.title"></h3></div>
+  <label class="field"><span data-i18n="bookings.ground"></span><select name="ground" id="bkGround"></select><small class="err" data-err="ground"></small></label>
+  <div class="chips" id="bkGroundChips"></div>
+  <div class="calcard"><div class="cal-h"><button type="button" class="cal-nav" id="calPrev" aria-label="Previous month">‹</button><b id="calTitle"></b><button type="button" class="cal-nav" id="calNext" aria-label="Next month">›</button></div><div class="cal-w" id="calWeek"></div><div class="cal-g" id="calGrid"></div></div>
+  <label class="sr"><span data-i18n="bookings.date"></span><input name="date" type="date"></label><small class="err" data-err="date"></small>
+  <h4 class="sec" data-i18n="bookings.slot"></h4>
+  <label class="sr"><span data-i18n="bookings.slot"></span><select name="slot" id="bkSlot"></select></label>
+  <div class="chips slotchips" id="bkSlotChips"></div><small class="err" data-err="slot"></small>
+  <h4 class="sec" data-i18n="bk.people"></h4>
+  <div class="chips pchips" id="bkPeople"></div><input type="hidden" name="people">
+  <label class="field"><span data-i18n="bookings.customer"></span><select name="customer" id="bkCustomer"></select><small class="err" data-err="customer"></small></label>
+  <p class="note price-note" id="bkPrice"></p>
+  <label class="field"><span data-i18n="bookings.discount"></span><input name="discount" type="number" min="0" inputmode="numeric"><small class="err" data-err="discount"></small></label>
+  <label class="field"><span data-i18n="bookings.repeat"></span><select name="repeat"><option value="1" data-i18n="bookings.repeatNone"></option></select></label>
+  <label class="field"><span data-i18n="bookings.advance"></span><input name="advance" type="number" min="0" inputmode="numeric"><small class="err" data-err="advance"></small></label>
+  <div class="cta"><span class="cta-t" data-i18n="bk.confirm"></span><button class="cta-go" type="submit" aria-label="Confirm booking">→</button></div>
+</form></dialog>
+
+<dialog id="payDlg"><form method="dialog" id="payForm" novalidate>
+  <h3 id="payTitle"></h3><p class="muted" id="payBalance"></p>
+  <label class="field"><span data-i18n="payments.amount"></span><input name="amount" type="number" min="1" inputmode="numeric"><small class="err" data-err="amount"></small></label>
+  <label class="field"><span data-i18n="payments.method"></span><select name="method"><option value="cash" data-i18n="payments.cash"></option><option value="upi" data-i18n="payments.upi"></option><option value="card" data-i18n="payments.card"></option></select></label>
+  <div class="row end"><button class="btn" type="button" data-close data-i18n="common.cancel"></button><button class="btn primary" type="submit" data-i18n="common.save"></button></div>
+</form></dialog>
+
+<dialog id="confirmDlg"><form method="dialog">
+  <h3 id="confirmTitle"></h3><p id="confirmBody"></p>
+  <div class="row end"><button class="btn" value="no" data-i18n="common.no"></button><button class="btn danger" value="yes" data-i18n="common.yes"></button></div>
+</form></dialog>
+
+<div id="toasts" aria-live="polite"></div>
+<script type="module" src="js/app.js"></script>
+<div id="lockScreen" class="lock" hidden role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+  <div class="lock-card">
+    <div class="lang-switch" id="lockLang" role="group"></div>
+    <h1 id="lockTitle" data-i18n="license.needTitle"></h1>
+    <p id="lockMsg" class="muted" data-i18n="license.needMsg"></p>
+    <form id="lockForm" novalidate>
+      <label class="field"><span data-i18n="license.codeLabel"></span><textarea name="code" rows="4" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="license.codePh"></textarea><small class="err" id="lockErr" role="alert"></small></label>
+      <button class="btn primary" type="submit" data-i18n="license.activate"></button>
+    </form>
+    <p class="note" data-i18n="license.contact"></p>
+    <a class="btn" id="lockWa" target="_blank" rel="noopener" data-i18n="license.whatsapp"></a>
+  </div>
+</div>
+</body>
+</html>
